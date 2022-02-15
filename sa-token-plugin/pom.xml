@@ -7,7 +7,7 @@
 	<parent>
         <groupId>cn.dev33</groupId>
         <artifactId>sa-token-parent</artifactId>
-        <version>1.29.1.trial</version>
+        <version>1.29.1.trial.yc</version>
     </parent>
     <packaging>pom</packaging>
     
@@ -17,16 +17,9 @@
 	
 	<!-- 所有子模块 -->
     <modules>
-        <module>sa-token-alone-redis</module>
         <module>sa-token-dao-redis</module>
         <module>sa-token-dao-redis-jackson</module>
-        <module>sa-token-dialect-thymeleaf</module>
        	<module>sa-token-oauth2</module>
-        <module>sa-token-quick-login</module>
-        <module>sa-token-spring-aop</module>
-        <module>sa-token-temp-jwt</module>
-        <module>sa-token-jwt</module>
-        <module>sa-token-context-dubbo</module>
     </modules>
 
 	<dependencies>
@@ -34,7 +27,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-			<version>2.0.0.RELEASE</version>
+			<version>${spring-boot-version}</version>
 			<optional>true</optional>
 		</dependency>
 	</dependencies>

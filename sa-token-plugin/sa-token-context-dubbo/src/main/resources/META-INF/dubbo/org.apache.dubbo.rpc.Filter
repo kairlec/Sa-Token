@@ -1,2 +1,0 @@
-saTokenDubboConsumerFilter=cn.dev33.satoken.context.dubbo.filter.SaTokenDubboConsumerFilter
-saTokenDubboProviderFilter=cn.dev33.satoken.context.dubbo.filter.SaTokenDubboProviderFilter

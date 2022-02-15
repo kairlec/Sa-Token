@@ -7,7 +7,7 @@
 	<parent>
         <groupId>cn.dev33</groupId>
         <artifactId>sa-token-parent</artifactId>
-        <version>1.29.1.trial</version>
+        <version>1.29.1.trial.yc</version>
     </parent>
     <packaging>pom</packaging>
     
@@ -20,9 +20,6 @@
         <module>sa-token-servlet</module>
         <module>sa-token-spring-boot-starter</module>
         <module>sa-token-reactor-spring-boot-starter</module>
-        <module>sa-token-solon-plugin</module>
-        <module>sa-token-jboot-plugin</module>
-        <module>sa-token-jfinal-plugin</module>
     </modules>
 
 </project>

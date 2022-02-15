@@ -36,7 +36,7 @@
 
 	<!-- 一些属性 -->
 	<properties>
-		<sa-token-version>1.29.1.trial</sa-token-version>
+		<sa-token-version>1.29.1.trial.yc</sa-token-version>
 		<spring-boot-version>3.0.0-M1</spring-boot-version>
 		<spring-version>6.0.0-M2</spring-version>
         <jdk.version>17</jdk.version>

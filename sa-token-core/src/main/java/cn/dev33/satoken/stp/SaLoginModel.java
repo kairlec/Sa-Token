@@ -16,7 +16,7 @@ import cn.dev33.satoken.util.SaTokenConsts;
 public class SaLoginModel {
 
 	/**
-	 * 此次登录的客户端设备标识 
+	 * 此次登录的客户端设备类型 
 	 */
 	public String device;
 	
@@ -42,14 +42,14 @@ public class SaLoginModel {
 	
 	
 	/**
-	 * @return 此次登录的客户端设备标识 
+	 * @return 此次登录的客户端设备类型
 	 */
 	public String getDevice() {
 		return device;
 	}
 
 	/**
-	 * @param device 此次登录的客户端设备标识 
+	 * @param device 此次登录的客户端设备类型
 	 * @return 对象自身
 	 */
 	public SaLoginModel setDevice(String device) {
@@ -160,6 +160,17 @@ public class SaLoginModel {
 	}
 
 	/**
+	 * 判断是否设置了扩展数据 
+	 * @return / 
+	 */
+	public boolean isSetExtraData() {
+		if(extraData == null || extraData.size() == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @return Cookie时长
 	 */
 	public int getCookieTimeout() {
@@ -216,13 +227,4 @@ public class SaLoginModel {
 		return new SaLoginModel();
 	}
 
-	
-	/**
-	 * 更换为 getDeviceOrDefault() 
-	 * @return / 
-	 */
-	@Deprecated
-	public String getDeviceOrDefalut() {
-		return getDeviceOrDefault();
-	}
 }

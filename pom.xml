@@ -8,8 +8,8 @@
     <groupId>cn.dev33</groupId>
     <artifactId>sa-token-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.29.1.trial.yc</version>
-
+	<version>${revision}</version>
+	
 	<!-- 项目介绍 -->
 	<name>sa-token</name>
 	<description>A Java Web lightweight authority authentication framework, comprehensive function, easy to use</description>
@@ -36,10 +36,10 @@
 
 	<!-- 一些属性 -->
 	<properties>
-		<sa-token-version>1.29.1.trial.yc</sa-token-version>
 		<spring-boot-version>3.0.0-M1</spring-boot-version>
 		<spring-version>6.0.0-M2</spring-version>
         <jdk.version>17</jdk.version>
+		<revision>1.31.0.yc</revision>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
 	</properties>
@@ -87,6 +87,34 @@
 				<encoding>UTF-8</encoding>
 			</configuration>
 		</plugin>
+
+        <!-- 统一版本号管理 -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>flatten-maven-plugin</artifactId>
+            <version>1.2.7</version>
+            <configuration>
+                <updatePomFile>true</updatePomFile>
+                <flattenMode>resolveCiFriendliesOnly</flattenMode>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>flatten</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>flatten</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>flatten.clean</id>
+                    <phase>clean</phase>
+                    <goals>
+                        <goal>clean</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
 	   </plugins>
 	   <pluginManagement>
 		   	<plugins>

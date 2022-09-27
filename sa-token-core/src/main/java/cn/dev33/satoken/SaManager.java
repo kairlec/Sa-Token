@@ -3,8 +3,6 @@ package cn.dev33.satoken;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.dev33.satoken.action.SaTokenAction;
-import cn.dev33.satoken.action.SaTokenActionDefaultImpl;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.config.SaTokenConfigFactory;
 import cn.dev33.satoken.context.SaTokenContext;
@@ -13,8 +11,10 @@ import cn.dev33.satoken.context.second.SaTokenSecondContext;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.dao.SaTokenDaoDefaultImpl;
 import cn.dev33.satoken.exception.SaTokenException;
-import cn.dev33.satoken.listener.SaTokenListener;
-import cn.dev33.satoken.listener.SaTokenListenerDefaultImpl;
+import cn.dev33.satoken.json.SaJsonTemplate;
+import cn.dev33.satoken.json.SaJsonTemplateDefaultImpl;
+import cn.dev33.satoken.sign.SaSignTemplate;
+import cn.dev33.satoken.sign.SaSignTemplateDefaultImpl;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpInterfaceDefaultImpl;
 import cn.dev33.satoken.stp.StpLogic;
@@ -28,7 +28,6 @@ import cn.dev33.satoken.util.SaFoxUtil;
  * @author kong
  *
  */
-@SuppressWarnings("deprecation")
 public class SaManager {
 
 	/**
@@ -94,24 +93,6 @@ public class SaManager {
 	}
 	
 	/**
-	 * 框架行为 Bean 
-	 */
-	private volatile static SaTokenAction saTokenAction;
-	public static void setSaTokenAction(SaTokenAction saTokenAction) {
-		SaManager.saTokenAction = saTokenAction;
-	}
-	public static SaTokenAction getSaTokenAction() {
-		if (saTokenAction == null) {
-			synchronized (SaManager.class) {
-				if (saTokenAction == null) {
-					setSaTokenAction(new SaTokenActionDefaultImpl());
-				}
-			}
-		}
-		return saTokenAction;
-	}
-	
-	/**
 	 * 上下文Context Bean  
 	 */
 	private volatile static SaTokenContext saTokenContext;
@@ -158,24 +139,6 @@ public class SaManager {
 	}
 
 	/**
-	 * 侦听器 Bean  
-	 */
-	private volatile static SaTokenListener saTokenListener;
-	public static void setSaTokenListener(SaTokenListener saTokenListener) {
-		SaManager.saTokenListener = saTokenListener;
-	}
-	public static SaTokenListener getSaTokenListener() {
-		if (saTokenListener == null) {
-			synchronized (SaManager.class) {
-				if (saTokenListener == null) {
-					setSaTokenListener(new SaTokenListenerDefaultImpl());
-				}
-			}
-		}
-		return saTokenListener;
-	}
-
-	/**
 	 * 临时令牌验证模块 Bean  
 	 */
 	private volatile static SaTempInterface saTemp;
@@ -192,6 +155,42 @@ public class SaManager {
 		}
 		return saTemp;
 	}
+
+	/**
+	 * JSON 转换器 Bean 
+	 */
+	private volatile static SaJsonTemplate saJsonTemplate;
+	public static void setSaJsonTemplate(SaJsonTemplate saJsonTemplate) {
+		SaManager.saJsonTemplate = saJsonTemplate;
+	}
+	public static SaJsonTemplate getSaJsonTemplate() {
+		if (saJsonTemplate == null) {
+			synchronized (SaManager.class) {
+				if (saJsonTemplate == null) {
+					setSaJsonTemplate(new SaJsonTemplateDefaultImpl());
+				}
+			}
+		}
+		return saJsonTemplate;
+	}
+
+	/**
+	 * 参数签名 Bean 
+	 */
+	private volatile static SaSignTemplate saSignTemplate;
+	public static void setSaSignTemplate(SaSignTemplate saSignTemplate) {
+		SaManager.saSignTemplate = saSignTemplate;
+	}
+	public static SaSignTemplate getSaSignTemplate() {
+		if (saSignTemplate == null) {
+			synchronized (SaManager.class) {
+				if (saSignTemplate == null) {
+					setSaSignTemplate(new SaSignTemplateDefaultImpl());
+				}
+			}
+		}
+		return saSignTemplate;
+	}
 	
 	/**
 	 * StpLogic集合, 记录框架所有成功初始化的StpLogic 
@@ -199,7 +198,7 @@ public class SaManager {
 	public static Map<String, StpLogic> stpLogicMap = new HashMap<String, StpLogic>();
 	
 	/**
-	 * 向集合中 put 一个 StpLogic 
+	 * 向全局集合中 put 一个 StpLogic 
 	 * @param stpLogic StpLogic
 	 */
 	public static void putStpLogic(StpLogic stpLogic) {
@@ -217,7 +216,7 @@ public class SaManager {
 			return StpUtil.stpLogic;
 		}
 		
-		// 从SaManager中获取 
+		// 从 stpLogicMap 中获取 
 		StpLogic stpLogic = stpLogicMap.get(loginType);
 		if(stpLogic == null) {
 			/*

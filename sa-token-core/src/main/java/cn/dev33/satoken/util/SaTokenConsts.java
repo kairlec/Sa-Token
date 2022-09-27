@@ -7,16 +7,23 @@ package cn.dev33.satoken.util;
  */
 public class SaTokenConsts {
 
+	private SaTokenConsts() {
+	}
 	
 	// =================== sa-token版本信息 ===================  
 	
 	/**
 	 * Sa-Token 当前版本号 
 	 */
-	public static final String VERSION_NO = "v1.29.1.trial";
+	public static final String VERSION_NO = "v1.31.0";
 
 	/**
-	 * Sa-Token 开源地址 
+	 * Sa-Token 开源地址 Gitee 
+	 */
+	public static final String GITEE_URL = "https://gitee.com/dromara/sa-token";
+
+	/**
+	 * Sa-Token 开源地址 GitHub  
 	 */
 	public static final String GITHUB_URL = "https://github.com/dromara/sa-token";
 
@@ -43,9 +50,29 @@ public class SaTokenConsts {
 	public static final String TOKEN_ACTIVITY_TIMEOUT_CHECKED_KEY = "TOKEN_ACTIVITY_TIMEOUT_CHECKED_KEY_"; 	
 
 	/**
-	 * 常量key标记: 在登录时，默认使用的设备名称 
+	 * 常量key标记: 在登录时，默认使用的设备类型 
 	 */
 	public static final String DEFAULT_LOGIN_DEVICE = "default-device"; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，默认封禁的服务类型 
+	 */
+	public static final String DEFAULT_DISABLE_SERVICE = "login"; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，默认封禁的等级 
+	 */
+	public static final int DEFAULT_DISABLE_LEVEL = 1; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，可使用的最小封禁级别 
+	 */
+	public static final int MIN_DISABLE_LEVEL = 1; 
+
+	/**
+	 * 常量key标记: 账号封禁级别，表示未被封禁 
+	 */
+	public static final int NOT_DISABLE_LEVEL = -2; 
 	
 	/**
 	 * 常量key标记: 在进行临时身份切换时使用的key 

@@ -4,12 +4,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
 import cn.dev33.satoken.exception.SaTokenException;
@@ -21,17 +24,28 @@ import cn.dev33.satoken.exception.SaTokenException;
  *
  */
 public class SaFoxUtil {
+	/**
+	 * 可以减少线程争用的随机对象
+	 */
+	private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
+	private SaFoxUtil() {
+	}
+	
 	/**
 	 * 打印 Sa-Token 版本字符画
 	 */
 	public static void printSaToken() {
-		String str = "____ ____    ___ ____ _  _ ____ _  _ \r\n" + "[__  |__| __  |  |  | |_/  |___ |\\ | \r\n"
+		String str = ""
+				+ "____ ____    ___ ____ _  _ ____ _  _ \r\n" 
+				+ "[__  |__| __  |  |  | |_/  |___ |\\ | \r\n"
 				+ "___] |  |     |  |__| | \\_ |___ | \\| " 
+//				+ SaTokenConsts.VERSION_NO 
 //				+ "sa-token：" 
-				+ "\r\n" + "DevDoc：" + SaTokenConsts.DEV_DOC_URL // + "\r\n";
+//				+ "\r\n" + "DevDoc：" + SaTokenConsts.DEV_DOC_URL // + "\r\n";
+				+ "\r\n" + SaTokenConsts.DEV_DOC_URL // + "\r\n";
 				+ " (" + SaTokenConsts.VERSION_NO + ")" 
-				+ "\r\n" + "GitHub：" + SaTokenConsts.GITHUB_URL // + "\r\n";
+//				+ "\r\n" + "GitHub：" + SaTokenConsts.GITHUB_URL // + "\r\n";
 				;
 		System.out.println(str);
 	}
@@ -44,10 +58,9 @@ public class SaFoxUtil {
 	 */
 	public static String getRandomString(int length) {
 		String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		Random random = new Random();
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < length; i++) {
-			int number = random.nextInt(62);
+			int number = RANDOM.nextInt(62);
 			sb.append(str.charAt(number));
 		}
 		return sb.toString();
@@ -72,12 +85,22 @@ public class SaFoxUtil {
 	}
 	
 	/**
+	 * 比较两个对象是否相等 
+	 * @param a 第一个对象 
+	 * @param b 第二个对象 
+	 * @return 两个对象是否相等 
+	 */
+	public static boolean equals(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
+    }
+	
+	/**
 	 * 以当前时间戳和随机int数字拼接一个随机字符串
 	 * 
 	 * @return 随机字符串
 	 */
 	public static String getMarking28() {
-		return System.currentTimeMillis() + "" + new Random().nextInt(Integer.MAX_VALUE);
+		return System.currentTimeMillis() + "" + RANDOM.nextInt(Integer.MAX_VALUE);
 	}
 
 	/**
@@ -88,6 +111,15 @@ public class SaFoxUtil {
 	public static String formatDate(Date date){
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 	}
+
+	/**
+	 * 将日期格式化 （yyyy-MM-dd HH:mm:ss）
+	 * @param zonedDateTime 日期
+	 * @return 格式化后的时间
+	 */
+	public static String formatDate(ZonedDateTime zonedDateTime) {
+		return zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	}
 	
 	/**
 	 * 从集合里查询数据
@@ -97,10 +129,11 @@ public class SaFoxUtil {
 	 * @param keyword  关键字
 	 * @param start    起始位置 (-1代表查询所有)
 	 * @param size     获取条数
+	 * @param sortType     排序类型（true=正序，false=反序）
+	 * 
 	 * @return 符合条件的新数据集合
 	 */
-	public static List<String> searchList(Collection<String> dataList, String prefix, String keyword, int start,
-			int size) {
+	public static List<String> searchList(Collection<String> dataList, String prefix, String keyword, int start, int size, boolean sortType) {
 		if (prefix == null) {
 			prefix = "";
 		}
@@ -117,7 +150,7 @@ public class SaFoxUtil {
 			}
 		}
 		// 取指定段数据
-		return searchList(list, start, size);
+		return searchList(list, start, size, sortType);
 	}
 
 	/**
@@ -126,9 +159,15 @@ public class SaFoxUtil {
 	 * @param list  数据集合
 	 * @param start 起始位置 (-1代表查询所有)
 	 * @param size  获取条数
+	 * @param sortType     排序类型（true=正序，false=反序）
+	 * 
 	 * @return 符合条件的新数据集合
 	 */
-	public static List<String> searchList(List<String> list, int start, int size) {
+	public static List<String> searchList(List<String> list, int start, int size, boolean sortType) {
+		// 如果是反序的话 
+		if(sortType == false) {
+			Collections.reverse(list);
+		}
 		// 取指定段数据
 		if (start < 0) {
 			return list;
@@ -154,13 +193,22 @@ public class SaFoxUtil {
 	 * @return 是否可以匹配 
 	 */
 	public static boolean vagueMatch(String patt, String str) {
-		// 如果表达式不带有*号，则只需简单equals即可 (速度提升200倍) 
+		// 两者均为 null 时，直接返回 true 
+		if(patt == null && str == null) {
+			return true;
+		}
+		// 两者其一为 null 时，直接返回 false 
+		if(patt == null || str == null) {
+			return false;
+		}
+		// 如果表达式不带有*号，则只需简单equals即可 (这样可以使速度提升200倍左右) 
 		if(patt.indexOf("*") == -1) {
 			return patt.equals(str);
 		}
+		// 正则匹配 
 		return Pattern.matches(patt.replaceAll("\\*", ".*"), str);
 	}
-
+	
 	/**
 	 * 将指定值转化为指定类型
 	 * @param <T> 泛型
@@ -244,8 +292,8 @@ public class SaFoxUtil {
 	 * @return 拼接后的url字符串 
 	 */
 	public static String joinParam(String url, String key, Object value) {
-		// 如果参数为空, 直接返回 
-		if(isEmpty(url) || isEmpty(key) || isEmpty(value)) {
+		// 如果url或者key为空, 直接返回 
+		if(isEmpty(url) || isEmpty(key)) {
 			return url;
 		}
 		return joinParam(url, key + "=" + value);
@@ -296,11 +344,37 @@ public class SaFoxUtil {
 	 * @return 拼接后的url字符串 
 	 */
 	public static String joinSharpParam(String url, String key, Object value) {
-		// 如果参数为空, 直接返回 
-		if(isEmpty(url) || isEmpty(key) || isEmpty(value)) {
+		// 如果url或者key为空, 直接返回 
+		if(isEmpty(url) || isEmpty(key)) {
 			return url;
 		}
 		return joinSharpParam(url, key + "=" + value);
+	}
+
+	/**
+	 * 拼接两个url 
+	 * <p> 例如：url1=http://domain.cn，url2=/sso/auth，则返回：http://domain.cn/sso/auth </p>
+	 * 
+	 * @param url1 第一个url 
+	 * @param url2 第二个url 
+	 * @return 拼接完成的url 
+	 */
+	public static String spliceTwoUrl(String url1, String url2) {
+		// q1、任意一个为空，则直接返回另一个 
+		if(url1 == null) {
+			return url2;
+		}
+		if(url2 == null) {
+			return url1;
+		}
+		
+		// q2、如果 url2 以 http 开头，将其视为一个完整地址 
+		if(url2.startsWith("http")) {
+			return url2;
+		}
+		
+		// q3、将两个地址拼接在一起 
+		return url1 + url2;
 	}
 	
 	/**
@@ -333,7 +407,7 @@ public class SaFoxUtil {
 	 * @return 拼接后的url字符串 
 	 */
 	public static boolean isUrl(String str) {
-		if(str == null) {
+		if(isEmpty(str)) {
 			return false;
 		}
         return str.toLowerCase().matches(URL_REGEX);

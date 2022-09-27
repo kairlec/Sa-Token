@@ -41,7 +41,7 @@ public class SaOAuth2Handle {
 		// 模式一：Code授权码
 		if(req.isPath(Api.authorize) && req.isParam(Param.response_type, ResponseType.code)) {
 			SaClientModel cm = currClientModel();
-			if(cfg.isCode && (cm.isCode || cm.isAutoMode)) {
+			if(cfg.getIsCode() && (cm.isCode || cm.isAutoMode)) {
 				return authorize(req, res, cfg);
 			}
 			throw new SaOAuth2Exception("暂未开放的授权模式");
@@ -75,7 +75,7 @@ public class SaOAuth2Handle {
 		// 模式二：隐藏式
 		if(req.isPath(Api.authorize) && req.isParam(Param.response_type, ResponseType.token)) {
 			SaClientModel cm = currClientModel();
-			if(cfg.isImplicit && (cm.isImplicit || cm.isAutoMode)) {
+			if(cfg.getIsImplicit() && (cm.isImplicit || cm.isAutoMode)) {
 				return authorize(req, res, cfg);
 			}
 			throw new SaOAuth2Exception("暂未开放的授权模式");
@@ -84,7 +84,7 @@ public class SaOAuth2Handle {
 		// 模式三：密码式
 		if(req.isPath(Api.token) && req.isParam(Param.grant_type, GrantType.password)) {
 			SaClientModel cm = currClientModel();
-			if(cfg.isPassword && (cm.isPassword || cm.isAutoMode)) {
+			if(cfg.getIsPassword() && (cm.isPassword || cm.isAutoMode)) {
 				return password(req, res, cfg);
 			}
 			throw new SaOAuth2Exception("暂未开放的授权模式");
@@ -93,7 +93,7 @@ public class SaOAuth2Handle {
 		// 模式四：凭证式
 		if(req.isPath(Api.client_token) && req.isParam(Param.grant_type, GrantType.client_credentials)) {
 			SaClientModel cm = currClientModel();
-			if(cfg.isClient && (cm.isClient || cm.isAutoMode)) {
+			if(cfg.getIsClient() && (cm.isClient || cm.isAutoMode)) {
 				return clientToken(req, res, cfg);
 			}
 			throw new SaOAuth2Exception("暂未开放的授权模式");
@@ -114,7 +114,7 @@ public class SaOAuth2Handle {
 		
 		// 1、如果尚未登录, 则先去登录
 		if(StpUtil.isLogin() == false) {
-			return cfg.notLoginView.get();
+			return cfg.getNotLoginView().get();
 		}
 
 		// 2、构建请求Model
@@ -129,7 +129,7 @@ public class SaOAuth2Handle {
 		// 5、判断：如果此次申请的Scope，该用户尚未授权，则转到授权页面
 		boolean isGrant = SaOAuth2Util.isGrant(ra.loginId, ra.clientId, ra.scope);
 		if(isGrant == false) {
-			return cfg.confirmView.apply(ra.clientId, ra.scope);
+			return cfg.getConfirmView().apply(ra.clientId, ra.scope);
 		}
 
 		// 6、判断授权类型
@@ -226,7 +226,7 @@ public class SaOAuth2Handle {
 	 * @return 处理结果
 	 */
 	public static Object doLogin(SaRequest req, SaResponse res, SaOAuth2Config cfg) {
-		return cfg.doLoginHandle.apply(req.getParamNotNull(Param.name), req.getParamNotNull("pwd"));
+		return cfg.getDoLoginHandle().apply(req.getParamNotNull(Param.name), req.getParamNotNull(Param.pwd));
 	}
 
 	/**
@@ -255,30 +255,31 @@ public class SaOAuth2Handle {
 		String username = req.getParamNotNull(Param.username);
 		String password = req.getParamNotNull(Param.password);
 		String clientId = req.getParamNotNull(Param.client_id);
+		String clientSecret = req.getParamNotNull(Param.client_secret);
 		String scope = req.getParam(Param.scope, "");
 
-		// 2、校验 ClientScope
-		SaOAuth2Util.checkContract(clientId, scope);
+		// 2、校验 ClientScope 和 scope 
+		SaOAuth2Util.checkClientSecretAndScope(clientId, clientSecret, scope);
 
 		// 3、防止因前端误传token造成逻辑干扰
-		SaHolder.getStorage().set(StpUtil.stpLogic.splicingKeyJustCreatedSave(), "no-token");
+		// SaHolder.getStorage().set(StpUtil.stpLogic.splicingKeyJustCreatedSave(), "no-token");
 
-		// 4、调用API 开始登录，如果没能成功登录，则直接退出
-		Object retObj = cfg.doLoginHandle.apply(username, password);
+		// 3、调用API 开始登录，如果没能成功登录，则直接退出
+		Object retObj = cfg.getDoLoginHandle().apply(username, password);
 		if(StpUtil.isLogin() == false) {
 			return retObj;
 		}
 
-		// 5、构建 ra对象
+		// 4、构建 ra对象
 		RequestAuthModel ra = new RequestAuthModel();
 		ra.clientId = clientId;
 		ra.loginId = StpUtil.getLoginId();
 		ra.scope = scope;
 
-		// 7、生成 Access-Token
+		// 5、生成 Access-Token
 		AccessTokenModel at = SaOAuth2Util.generateAccessToken(ra, true);
 
-		// 8、返回 Access-Token
+		// 6、返回 Access-Token
 		return SaResult.data(at.toLineMap());
 	}
 

@@ -10,9 +10,12 @@ import java.util.Map;
  *
  */
 public class SaLoginConfig {
+	
+	private SaLoginConfig() {
+	}
 
 	/**
-	 * @param device 此次登录的客户端设备标识 
+	 * @param device 此次登录的客户端设备类型 
 	 * @return SaLoginModel配置对象 
 	 */
 	public static SaLoginModel setDevice(String device) {
@@ -31,7 +34,7 @@ public class SaLoginConfig {
 	 * @param timeout 指定此次登录token的有效期, 单位:秒 （如未指定，自动取全局配置的timeout值）
 	 * @return 对象自身
 	 */
-	public static SaLoginModel setTimeout(Long timeout) {
+	public static SaLoginModel setTimeout(long timeout) {
 		return create().setTimeout(timeout);
 	}
 

@@ -3,7 +3,7 @@ package cn.dev33.satoken.config;
 import java.io.Serializable;
 
 /**
- * Sa-Token 配置类 Model
+ * Sa-Token 配置类 Model 
  * <p>
  * 你可以通过yml、properties、java代码等形式配置本类参数，具体请查阅官方文档: http://sa-token.dev33.cn/
  * 
@@ -32,11 +32,16 @@ public class SaTokenConfig implements Serializable {
 	/** 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token) */
 	private Boolean isShare = true;
 
+	/**
+	 * 同一账号最大登录数量，-1代表不限 （只有在 isConcurrent=true, isShare=false 时此配置才有效）
+	 */
+	private int maxLoginCount = 12;
+
 	/** 是否尝试从请求体里读取token */
 	private Boolean isReadBody = true;
 
 	/** 是否尝试从header里读取token */
-	private Boolean isReadHead = true;
+	private Boolean isReadHeader = true;
 
 	/** 是否尝试从cookie里读取token */
 	private Boolean isReadCookie = true;
@@ -87,11 +92,6 @@ public class SaTokenConfig implements Serializable {
 	 * Cookie配置对象 
 	 */
 	public SaCookieConfig cookie = new SaCookieConfig();
-	
-	/**
-	 * SSO单点登录配置对象 
-	 */
-	public SaSsoConfig sso = new SaSsoConfig();
 	
 
 	/**
@@ -177,6 +177,22 @@ public class SaTokenConfig implements Serializable {
 	}
 
 	/**
+	 * @return 同一账号最大登录数量，-1代表不限 （只有在 isConcurrent=true, isShare=false 时此配置才有效）
+	 */
+	public int getMaxLoginCount() {
+		return maxLoginCount;
+	}
+
+	/**
+	 * @param maxLoginCount 同一账号最大登录数量，-1代表不限 （只有在 isConcurrent=true, isShare=false 时此配置才有效）
+	 * @return 对象自身 
+	 */
+	public SaTokenConfig setMaxLoginCount(int maxLoginCount) {
+		this.maxLoginCount = maxLoginCount;
+		return this;
+	}
+
+	/**
 	 * @return 是否尝试从请求体里读取token
 	 */
 	public Boolean getIsReadBody() {
@@ -195,16 +211,16 @@ public class SaTokenConfig implements Serializable {
 	/**
 	 * @return 是否尝试从header里读取token
 	 */
-	public Boolean getIsReadHead() {
-		return isReadHead;
+	public Boolean getIsReadHeader() {
+		return isReadHeader;
 	}
 
 	/**
-	 * @param isReadHead 是否尝试从header里读取token
+	 * @param isReadHeader 是否尝试从header里读取token
 	 * @return 对象自身
 	 */
-	public SaTokenConfig setIsReadHead(Boolean isReadHead) {
-		this.isReadHead = isReadHead;
+	public SaTokenConfig setIsReadHeader(Boolean isReadHeader) {
+		this.isReadHeader = isReadHeader;
 		return this;
 	}
 
@@ -419,22 +435,6 @@ public class SaTokenConfig implements Serializable {
 	}
 	
 	/**
-	 * @return SSO单点登录配置对象 
-	 */
-	public SaSsoConfig getSso() {
-		return sso;
-	}
-	
-	/**
-	 * @param sso SSO单点登录配置对象 
-	 * @return 对象自身 
-	 */
-	public SaTokenConfig setSso(SaSsoConfig sso) {
-		this.sso = sso;
-		return this;
-	}
-	
-	/**
 	 * @return Cookie 全局配置对象
 	 */
 	public SaCookieConfig getCookie() {
@@ -458,8 +458,9 @@ public class SaTokenConfig implements Serializable {
 				+ ", activityTimeout=" + activityTimeout
 				+ ", isConcurrent=" + isConcurrent 
 				+ ", isShare=" + isShare 
+				+ ", maxLoginCount=" + maxLoginCount 
 				+ ", isReadBody=" + isReadBody
-				+ ", isReadHead=" + isReadHead 
+				+ ", isReadHeader=" + isReadHeader 
 				+ ", isReadCookie=" + isReadCookie
 				+ ", tokenStyle=" + tokenStyle
 				+ ", dataRefreshPeriod=" + dataRefreshPeriod 
@@ -473,51 +474,28 @@ public class SaTokenConfig implements Serializable {
 				+ ", basic=" + basic 
 				+ ", currDomain=" + currDomain 
 				+ ", checkIdToken=" + checkIdToken 
-				+ ", sso=" + sso 
 				+ ", cookie=" + cookie 
 				+ "]";
 	}
 
 	
 	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsConcurrent() ，使用方式保持不变 </h1>
-	 * @param allowConcurrentLogin see note
-	 * @return  see note
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getIsReadHeader() ，使用方式保持不变 </h1>
+	 * @return 是否尝试从header里读取token
 	 */
 	@Deprecated
-	public SaTokenConfig setAllowConcurrentLogin(Boolean allowConcurrentLogin) {
-		this.isConcurrent = allowConcurrentLogin;
-		return this;
+	public Boolean getIsReadHead() {
+		return isReadHeader;
 	}
 
 	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsConcurrent() ，使用方式保持不变 </h1>
-	 * @param isV see note
-	 * @return see note
-	 */
-	@Deprecated
-	public SaTokenConfig setIsV(Boolean isV) {
-		this.isPrint = isV;
-		return this;
-	}
-
-	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getCookie().getDomain() ，使用方式保持不变 </h1>
-	 * @return 写入Cookie时显式指定的作用域, 常用于单点登录二级域名共享Cookie的场景
-	 */
-	@Deprecated
-	public String getCookieDomain() {
-		return getCookie().getDomain();
-	}
-
-	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getCookie().setDomain() ，使用方式保持不变 </h1>
-	 * @param cookieDomain 写入Cookie时显式指定的作用域, 常用于单点登录二级域名共享Cookie的场景
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsReadHeader() ，使用方式保持不变 </h1>
+	 * @param isReadHead 是否尝试从header里读取token
 	 * @return 对象自身
 	 */
 	@Deprecated
-	public SaTokenConfig setCookieDomain(String cookieDomain) {
-		this.getCookie().setDomain(cookieDomain);
+	public SaTokenConfig setIsReadHead(Boolean isReadHead) {
+		this.isReadHeader = isReadHead;
 		return this;
 	}
 

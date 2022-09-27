@@ -1,23 +1,25 @@
 package cn.dev33.satoken.listener;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 /**
- * Sa-Token 侦听器的默认实现：log打印 
+ * Sa-Token 侦听器实现：控制台 log 打印 
  * @author kong
  *
  */
-public class SaTokenListenerDefaultImpl implements SaTokenListener {
+public class SaTokenListenerForConsolePrint implements SaTokenListener {
 
 	/**
 	 * 每次登录时触发 
 	 */
 	@Override
-	public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
+	public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
 		println("账号[" + loginId + "]登录成功");
 	}
 
@@ -49,17 +51,18 @@ public class SaTokenListenerDefaultImpl implements SaTokenListener {
 	 * 每次被封禁时触发
 	 */
 	@Override
-	public void doDisable(String loginType, Object loginId, long disableTime) {
-		Date date = new Date(System.currentTimeMillis() + disableTime * 1000);
-		println("账号[" + loginId + "]被封禁 (解封时间: " + SaFoxUtil.formatDate(date) + ")");
+	public void doDisable(String loginType, Object loginId, String service, int level, long disableTime) {
+		Instant instant = Instant.ofEpochMilli(System.currentTimeMillis() + disableTime * 1000);
+		ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+		println("账号[" + loginId + "] " + service + " 服务被封禁，封禁等级=" + level + " (解封时间: " + SaFoxUtil.formatDate(zonedDateTime) + ")");
 	}
 
 	/**
 	 * 每次被解封时触发
 	 */
 	@Override
-	public void doUntieDisable(String loginType, Object loginId) {
-		println("账号[" + loginId + "]被解除封禁");
+	public void doUntieDisable(String loginType, Object loginId, String service) {
+		println("账号[" + loginId + "] " + service + " 服务被解除封禁");
 	}
 
 	/**
@@ -76,6 +79,14 @@ public class SaTokenListenerDefaultImpl implements SaTokenListener {
 	@Override
 	public void doLogoutSession(String id) {
 		println("Session[" + id + "]注销成功");
+	}
+
+	/**
+	 * 每次Token续期时触发
+	 */
+	@Override
+	public void doRenewTimeout(String tokenValue, Object loginId, long timeout) {
+		println("帐号[" + loginId + "]，Token=" + tokenValue + " 续期timeout成功!");
 	}
 
 	/**

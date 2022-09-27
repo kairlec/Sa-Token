@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.util.PathMatcher;
 
 import cn.dev33.satoken.SaManager;
@@ -30,6 +31,7 @@ import cn.dev33.satoken.temp.SaTempInterface;
  * @author kong
  *
  */
+@AutoConfiguration
 public class SaBeanInject {
 
 	/**

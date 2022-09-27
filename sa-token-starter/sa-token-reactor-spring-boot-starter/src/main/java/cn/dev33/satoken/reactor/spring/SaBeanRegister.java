@@ -1,5 +1,6 @@
 package cn.dev33.satoken.reactor.spring;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -15,6 +16,7 @@ import cn.dev33.satoken.reactor.spring.json.SaJsonTemplateForJackson;
  * @author kong
  *
  */
+@AutoConfiguration
 public class SaBeanRegister {
 
 	/**

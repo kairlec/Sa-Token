@@ -1,5 +1,6 @@
 package cn.dev33.satoken.spring.oauth2;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import cn.dev33.satoken.oauth2.config.SaOAuth2Config;
  * @author kong
  *
  */
+@AutoConfiguration
 @ConditionalOnClass(SaOAuth2Manager.class)
 public class SaOAuth2BeanRegister {
 

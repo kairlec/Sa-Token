@@ -39,7 +39,7 @@
 		<spring-boot-version>3.0.0-M5</spring-boot-version>
 		<spring-version>6.0.0-M6</spring-version>
         <jdk.version>17</jdk.version>
-		<revision>1.31.0.yc</revision>
+		<revision>1.31.0.1.yc</revision>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
 	</properties>
